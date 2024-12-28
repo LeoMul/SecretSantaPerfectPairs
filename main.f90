@@ -1,4 +1,9 @@
 program secretsanta
+    !SecretSanta perfect pair sampling. 
+    !Author: Leo Patrick Mulholland https://github.com/LeoMul   
+    !with insights from Sean Marshallsay https://github.com/Sean1708
+
+    !This code is maintained at https://github.com/LeoMul/SecretSantaPerfectPairs. 
 
     logical :: input_exists
     integer*8 :: num_people
@@ -168,84 +173,7 @@ program secretsanta
 
     end function 
 
-    subroutine numPerfectPairsWithPosArray(array,assigned_array,number_of_perfect_pairs,position_array)
-        
-        !array is an vector of 1,2,3,4,...,size(array)
-        !assigned array is the assignment of each element of array.
-        !i.e if person1  is assigned 3, the first elment of assigned_array is 3.
-        !this function finds the number of perfect pairs
-        !i.e the number of times that something that person_i is assigned person_j,
-        !and person_j is assigned person_i.
 
-        !this version of the routine also tracks where the perfect pairs are.
-        !was for testing and found to not really slow things down.
-        !the bottleneck is porbably in the O(n^2) implementation.
-
-        integer*8 :: number_of_perfect_pairs 
-        integer*8 :: ii,jj,num_people 
-
-        integer*8 :: ele1,ele2 
-        integer*8 :: ele3,ele4
-        integer*8 :: array(:), assigned_array(:), position_array(:)
-
-        position_array = 0
-        num_people = size(array)
-        number_of_perfect_pairs = 0
-
-        do ii = 1,num_people 
-            ele1 = ii  
-            ele2 = assigned_array(ii)
-            do jj = ii+1,num_people
-                ele3 = jj 
-                ele4 = assigned_array(jj)
-
-                if ( (ele4 .eq. ele1) .and. (ele2 .eq. ele3)) then 
-                    number_of_perfect_pairs = number_of_perfect_pairs + 1
-                    position_array(ii) = number_of_perfect_pairs
-                    position_array(jj) = number_of_perfect_pairs
-                end if 
-
-            end do 
-        end do 
-
-
-    end subroutine
-
-subroutine numPerfectPairs(array,assigned_array,number_of_perfect_pairs)
-        
-        !array is an vector of 1,2,3,4,...,size(array)
-        !assigned array is the assignment of each element of array.
-        !i.e if person1  is assigned 3, the first elment of assigned_array is 3.
-        !this function finds the number of perfect pairs
-        !i.e the number of times that something that person_i is assigned person_j,
-        !and person_j is assigned person_i.
-
-        integer*8 :: number_of_perfect_pairs 
-        integer*8 :: ii,jj,num_people 
-
-        integer*8 :: ele1,ele2 
-        integer*8 :: ele3,ele4
-        integer*8 :: array(:), assigned_array(:)
-
-        num_people = size(array)
-        number_of_perfect_pairs = 0
-
-        do ii = 1,num_people 
-            ele1 = ii  
-            ele2 = assigned_array(ii)
-            do jj = ii+1,num_people
-
-                ele3 = jj 
-                ele4 = assigned_array(jj)
-                if ( (ele4 .eq. ele1) .and. (ele2 .eq. ele3)) then 
-                    number_of_perfect_pairs = number_of_perfect_pairs + 1
-                end if 
-
-            end do 
-        end do 
-
-
-    end subroutine
 
     subroutine numPerfectPairsSean(array,assigned_array,number_of_perfect_pairs)
         
@@ -311,8 +239,89 @@ subroutine numPerfectPairs(array,assigned_array,number_of_perfect_pairs)
 
     end subroutine
 
-    subroutine write_out()
+
+    !The following routines are retired
+    subroutine numPerfectPairs(array,assigned_array,number_of_perfect_pairs)
+        !this routine has been retired     
+
+        !array is an vector of 1,2,3,4,...,size(array)
+        !assigned array is the assignment of each element of array.
+        !i.e if person1  is assigned 3, the first elment of assigned_array is 3.
+        !this function finds the number of perfect pairs
+        !i.e the number of times that something that person_i is assigned person_j,
+        !and person_j is assigned person_i.
+
+        integer*8 :: number_of_perfect_pairs 
+        integer*8 :: ii,jj,num_people 
+
+        integer*8 :: ele1,ele2 
+        integer*8 :: ele3,ele4
+        integer*8 :: array(:), assigned_array(:)
+
+        num_people = size(array)
+        number_of_perfect_pairs = 0
+
+        do ii = 1,num_people 
+            ele1 = ii  
+            ele2 = assigned_array(ii)
+            do jj = ii+1,num_people
+
+                ele3 = jj 
+                ele4 = assigned_array(jj)
+                if ( (ele4 .eq. ele1) .and. (ele2 .eq. ele3)) then 
+                    number_of_perfect_pairs = number_of_perfect_pairs + 1
+                end if 
+
+            end do 
+        end do 
+
+
+    end subroutine
+
+    subroutine numPerfectPairsWithPosArray(array,assigned_array,number_of_perfect_pairs,position_array)
         
-    end subroutine  
+        !retired routine
+        !the numPerfectPairsSean routine could also have this kind of addition where the positions are tracked.
+
+        !array is an vector of 1,2,3,4,...,size(array)
+        !assigned array is the assignment of each element of array.
+        !i.e if person1  is assigned 3, the first elment of assigned_array is 3.
+        !this function finds the number of perfect pairs
+        !i.e the number of times that something that person_i is assigned person_j,
+        !and person_j is assigned person_i.
+
+        !this version of the routine also tracks where the perfect pairs are.
+        !was for testing and found to not really slow things down.
+        !the bottleneck is porbably in the O(n^2) implementation.
+
+        integer*8 :: number_of_perfect_pairs 
+        integer*8 :: ii,jj,num_people 
+
+        integer*8 :: ele1,ele2 
+        integer*8 :: ele3,ele4
+        integer*8 :: array(:), assigned_array(:), position_array(:)
+
+        position_array = 0
+        num_people = size(array)
+        number_of_perfect_pairs = 0
+
+        do ii = 1,num_people 
+            ele1 = ii  
+            ele2 = assigned_array(ii)
+            do jj = ii+1,num_people
+                ele3 = jj 
+                ele4 = assigned_array(jj)
+
+                if ( (ele4 .eq. ele1) .and. (ele2 .eq. ele3)) then 
+                    number_of_perfect_pairs = number_of_perfect_pairs + 1
+                    position_array(ii) = number_of_perfect_pairs
+                    position_array(jj) = number_of_perfect_pairs
+                end if 
+
+            end do 
+        end do 
+
+
+    end subroutine
 
 end program 
