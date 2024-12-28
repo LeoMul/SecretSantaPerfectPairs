@@ -1,9 +1,9 @@
 # SecretSantaPerfectPairs
 What are the chances of two people having one another in Secret Santa? 
 This quantity, a perfect pair, appears to be incredibly likely, and is 
-calculated here. 
+calculated here. Compile the code with
 ```
-gfortran main.f90 -o main.x -{your flags}
+gfortran main.f90 -o SecretSantaPP.x -{your flags}
 ```
 The executable is obviously named to your liking. 
 The code expects an input file called _ss.inp_. If this is not in the running directory,
