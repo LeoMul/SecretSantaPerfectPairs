@@ -4,67 +4,96 @@ program secretsanta
     !with insights from Sean Marshallsay https://github.com/Sean1708
 
     !This code is maintained at https://github.com/LeoMul/SecretSantaPerfectPairs. 
-
+    use mpi
     logical :: input_exists
     integer*8 :: num_people
-    integer*8 :: num_samples
+    integer*8 :: num_samples, total_num
     integer*8,allocatable:: num_people_array(:)
-    real*8 ,allocatable :: perfect_pair_array_float(:)
+    real*8 ,allocatable :: perfect_pair_array_float(:),perfect_pair_array_float_master(:)
     real*8 ,allocatable :: data_array(:,:)
-
-    integer*8 :: iter, ii
+    real*8 :: t1,t2
+    integer*8 :: iter, ii   
     
     integer*8 :: size_num_people_array
     integer*8 :: max_num_people 
 
+    integer*4,parameter :: seedInt = 123456789
+    integer*4,dimension(8) ::seed = seedInt
+    
+    !mpi stuff:
+    integer process_Rank, size_Of_Cluster, ierror
+
+
     namelist/SecretSantaInput/ num_samples,num_pops
 
+    call MPI_INIT(ierror)
+
+    call MPI_COMM_SIZE(MPI_COMM_WORLD, size_Of_Cluster, ierror)
+    call MPI_COMM_RANK(MPI_COMM_WORLD, process_Rank, ierror)
+
+    call cpu_time(t1)
+
+    seed = seed*(process_Rank+1)
+    call random_seed(put = seed)
+
+    !print*,'hello'
     call parseInput 
+
 
     size_num_people_array = size(num_people_array)
     max_num_people = maxval(num_people_array)
     allocate(data_array(size_num_people_array,max_num_people))
     data_array = 0.0d0
-
+    num_samples = num_samples / size_Of_Cluster 
+    total_num = num_samples * size_Of_Cluster
+    
     do ii = 1,size_num_people_array
         num_people = num_people_array(ii)
         allocate(perfect_pair_array_float(0:num_people-1))
+        allocate(perfect_pair_array_float_master(0:num_people-1))
+        
         call collect_sample_data(num_samples,num_people,perfect_pair_array_float)
-        data_array(ii,1:num_people) = perfect_pair_array_float
+       
+        call mpi_reduce(perfect_pair_array_float,perfect_pair_array_float_master,int(num_people),mpi_double,mpi_sum,0,mpi_comm_world,ierr)
+       
+        data_array(ii,1:num_people) = perfect_pair_array_float_master / total_num
+       
         deallocate(perfect_pair_array_float)
-    end do 
+        deallocate(perfect_pair_array_float_master)
 
-    write(*,11) num_people_array(:)
-    do iter = 1,max_num_people
-        write(*,12) iter-1,data_array(:,iter)
     end do 
+    call cpu_time(t2)
+
+    if(process_Rank .eq. 0) then 
+        write(*,10) t2-t1
+        write(*,11) num_people_array(:)
+        do iter = 1,max_num_people
+            write(*,12) iter-1,data_array(:,iter)
+        end do 
+    end if 
+
+    call mpi_finalize(ierr)
 
     !10 format('Number of perfect pairs:',I4,1X,'Probability: ',F10.5,'%')
 
     !10 format('#',16x,'System size -->')
+    10 format('#CPU Time(s) = ',F10.2)
     11 format('#NumPerfPairs; N = ',1X,200(I10,1X))
     12 format(8x,I5,7X,200(F10.5,1X))
 
     contains 
 
-    subroutine main 
-
-    end subroutine
-
     subroutine collect_sample_data(num_samples, num_people,perfect_pair_array_float)
         integer*8 :: num_people, num_samples 
         integer*8 :: array(num_people),assigned_array(num_people),position_array(num_people)
-        !can't assert the size of perfect_pair_array to be num people - 
         real*8,intent(inout) :: perfect_pair_array_float(:)
         integer*8 :: perfect_pair_array(0:size(perfect_pair_array_float)-1)
 
-        integer*8 :: ii,jj!,kk
+        integer*8 :: ii,jj
 
-        integer*4,parameter :: seedInt = 123456789
-        integer*4,dimension(8) ::seed = seedInt
+
 
         !init:        
-        call random_seed(put = seed)
 
         perfect_pair_array = 0
         assigned_array = 0
@@ -72,24 +101,15 @@ program secretsanta
         do ii = 1,num_people
             array(ii) = ii
         end do 
-        
+        write(0,*) num_samples,process_Rank
         !collect data.
         do ii = 1,num_samples
             call distribute(array,assigned_array)
             call numPerfectPairsSean(array,assigned_array,jj)
-            !call numPerfectPairsWithPosArray(array,assigned_array,jj,position_array)
-
-            !jj = number_of_perfect_pairs(array,assigned_array)
-            !if (jj .eq. 2) then 
-            !    print*,'--------------------------------------'
-            !    do kk =1,num_people 
-            !        write(*,'(3I4)') array(kk),assigned_array(kk),position_array(kk)
-            !    end do
-            !end if 
             perfect_pair_array(jj) = perfect_pair_array(jj) + 1
         end do
 
-        perfect_pair_array_float = real(perfect_pair_array) / real(num_samples)
+        perfect_pair_array_float = real(perfect_pair_array)
 
     end subroutine
 
