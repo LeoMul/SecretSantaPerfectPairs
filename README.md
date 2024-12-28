@@ -45,4 +45,4 @@ You can pipe this into a formatted file of your choosing with
 ```
 ./main.x > {your file name}
 ```
-Possible upgrades to the code include OpenMP parallelisation for the sampling, or perhaps even a large-deviation implementation to sample huge system sizes, where in principle all parties can be in a perfect pair (for even system size). This would allow an indirect sampling of distribution, see for example _Wang F and Landau D P 2001 Phys. Rev. Lett. 86 2050_.
+Possible upgrades to the code include OpenMP parallelisation for the sampling, or perhaps even a large-deviation implementation to sample huge system sizes, where in principle all parties can be in a perfect pair (for even system size). This would allow an indirect sampling of distribution, see for example _Wang F and Landau D P 2001 Phys. Rev. Lett. 86 2050_. This would probably be done in Rust, where my colleague Yannick Feld has a library for this, see for example https://github.com/Pardoxa/sampling. 
