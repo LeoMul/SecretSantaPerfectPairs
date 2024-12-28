@@ -17,7 +17,7 @@ To use it you can use
 ```
 where warning message won't be piped in as it is forced to stderr. The input is a fortran namelist,
 specifying the number of random samples taken per system size, and the number of system sizes to be checked. The specific system sizes to be checked are then put under the input, for example: 
-'''
+```
 &SecretSantaInput 
 num_samples = 10000
 num_pops = 3
@@ -25,5 +25,5 @@ num_pops = 3
 2
 500
 2000
-''' 
+```
 will perform 10_000 samples on the system sizes 2, 500 and 2000.
