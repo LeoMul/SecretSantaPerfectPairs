@@ -71,7 +71,7 @@ program secretsanta
         !collect data.
         do ii = 1,num_samples
             call distribute(array,assigned_array)
-            call numPerfectPairs(array,assigned_array,jj)
+            call numPerfectPairsSean(array,assigned_array,jj)
             !call numPerfectPairsWithPosArray(array,assigned_array,jj,position_array)
 
             !jj = number_of_perfect_pairs(array,assigned_array)
@@ -234,9 +234,9 @@ subroutine numPerfectPairs(array,assigned_array,number_of_perfect_pairs)
             ele1 = ii  
             ele2 = assigned_array(ii)
             do jj = ii+1,num_people
+
                 ele3 = jj 
                 ele4 = assigned_array(jj)
-
                 if ( (ele4 .eq. ele1) .and. (ele2 .eq. ele3)) then 
                     number_of_perfect_pairs = number_of_perfect_pairs + 1
                 end if 
@@ -244,6 +244,36 @@ subroutine numPerfectPairs(array,assigned_array,number_of_perfect_pairs)
             end do 
         end do 
 
+
+    end subroutine
+
+    subroutine numPerfectPairsSean(array,assigned_array,number_of_perfect_pairs)
+        
+        !array is an vector of 1,2,3,4,...,size(array)
+        !assigned array is the assignment of each element of array.
+        !i.e if person1  is assigned 3, the first elment of assigned_array is 3.
+        !this function finds the number of perfect pairs
+        !i.e the number of times that something that person_i is assigned person_j,
+        !and person_j is assigned person_i.
+
+        !credit to Sean Marshallsay for his insights in writing this routine 
+        !here the number of pairs is double counted and must be divided by two. 
+
+        integer*8 :: number_of_perfect_pairs 
+        integer*8 :: ii,num_people 
+        integer*8 :: array(:), assigned_array(:)
+
+        num_people = size(array)
+        number_of_perfect_pairs = 0
+
+        !double counts - which im not sure is avoidavle as in principle 
+        !pairs can be localised to the last few elements of the array.
+        do ii = 1,num_people                
+            if ( assigned_array(assigned_array(ii)) .eq. ii) then 
+                number_of_perfect_pairs = number_of_perfect_pairs + 1
+            end if
+        end do 
+        number_of_perfect_pairs = number_of_perfect_pairs/2
 
     end subroutine
 
@@ -263,7 +293,8 @@ subroutine numPerfectPairs(array,assigned_array,number_of_perfect_pairs)
         inquire(file='ss.inp',exist=input_exists)
         if( .not.(input_exists)) then 
             call printEmptyInput()
-            stop 'no input is found '
+            write(0,*) 'no input is found (this is forced to err so wont be piped if you pipe the above) '
+            stop
         end if 
         open(1,file='ss.inp')
         read(1,SecretSantaInput)
