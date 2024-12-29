@@ -64,22 +64,24 @@ program secretsanta
     end do 
     call cpu_time(t2)
 
-    if(process_Rank .eq. 0) then 
+    if(process_Rank .eq. 0) then
+        write(*,9) total_num
         write(*,10) t2-t1
         write(*,11) num_people_array(:)
         do iter = 1,max_num_people
             write(*,12) iter-1,data_array(:,iter)
-        end do 
-    end if 
+        end do
+    end if
 
     call mpi_finalize(ierr)
 
     !10 format('Number of perfect pairs:',I4,1X,'Probability: ',F10.5,'%')
 
     !10 format('#',16x,'System size -->')
-    10 format('#CPU Time(s) = ',F10.2)
+     9 format('#NumSamples = ',I20)
+    10 format('#CPU Time(s) = ',ES10.2)
     11 format('#NumPerfPairs; N = ',1X,200(I10,1X))
-    12 format(8x,I5,7X,200(F10.5,1X))
+    12 format(8x,I5,7X,200(ES20.12,1X))
 
     contains 
 
@@ -252,6 +254,7 @@ program secretsanta
                 read(1,*) num_people_array(ii)
             end do 
         else 
+            
             stop 'invalid number of populations'
         end if 
     
